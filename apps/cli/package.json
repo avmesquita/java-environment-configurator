@@ -22,7 +22,7 @@
   "pkg": {
     "scripts": "dist/**/*.js",
     "assets": [
-      "node_modules/better-sqlite3/build/Release/better_sqlite3.node"
+      "../../node_modules/better-sqlite3/build/Release/better_sqlite3.node"
     ],
     "targets": [
       "node18-win-x64"
