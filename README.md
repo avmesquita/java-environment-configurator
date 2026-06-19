@@ -1,4 +1,5 @@
 # Java Environment Configurator
+[![CI](https://github.com/avmesquita/java-environment-configurator/actions/workflows/ci.yml/badge.svg)](https://github.com/avmesquita/java-environment-configurator/actions/workflows/ci.yml)
 
 Aplicativo desktop (Angular 20 + Electron) e CLI (`pkg`) para leitura e escrita do `ROOT.xml` do Tomcat, com foco em:
 
