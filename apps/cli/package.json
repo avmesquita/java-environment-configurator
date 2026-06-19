@@ -1,0 +1,32 @@
+{
+  "name": "@avm/cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CLI Java Environment Configurator",
+  "bin": {
+    "avm-config": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "package": "npm run build && pkg . --targets node18-win-x64 --output ../../release/cli/avm-config.exe"
+  },
+  "dependencies": {
+    "@avm/core": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "pkg": "^5.8.1",
+    "typescript": "^5.8.3"
+  },
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "assets": [
+      "node_modules/better-sqlite3/build/Release/better_sqlite3.node"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "../../release/cli"
+  }
+}

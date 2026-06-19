@@ -1,0 +1,54 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Visao Geral</h1>
+      <p>Resumo da configuracao atual do ROOT.xml</p>
+    </div>
+    <button type="button" (click)="load()">Atualizar</button>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Carregando...</p>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+    <p class="muted">Verifique a resolucao do ROOT.xml em <a routerLink="/settings">Configuracoes</a>.</p>
+  }
+
+  @if (config(); as cfg) {
+    <div class="quick-links">
+      <a routerLink="/project">Editar docBase</a>
+      <a routerLink="/datasources">Editar DataSources</a>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <h2>Projeto (docBase)</h2>
+        <p class="value">{{ cfg.docBase }}</p>
+        <p class="meta">{{ cfg.rawPath }}</p>
+      </article>
+
+      @if (cfg.hibernateDialect) {
+        <article class="card">
+          <h2>Dialect Hibernate (global)</h2>
+          <p class="value">{{ cfg.hibernateDialect }}</p>
+        </article>
+      }
+    </div>
+
+    <h2 class="section-title">DataSources ({{ cfg.dataSources.length }})</h2>
+    <div class="grid">
+      @for (item of cfg.dataSources; track item.name) {
+        <article class="card">
+          <h3>{{ item.name }}</h3>
+          <dl>
+            <dt>URL</dt><dd>{{ item.url }}</dd>
+            <dt>Usuario</dt><dd>{{ item.username }}</dd>
+            <dt>Driver</dt><dd>{{ item.driverClassName }}</dd>
+          </dl>
+        </article>
+      }
+    </div>
+  }
+</section>

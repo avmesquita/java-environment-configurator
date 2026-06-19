@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+release/
+*.db
+*.db-journal
+.DS_Store
+Thumbs.db
+*.log
+.angular/
+coverage/
+*.tsbuildinfo

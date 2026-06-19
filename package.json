@@ -1,0 +1,28 @@
+{
+  "name": "java-environment-configurator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Configurador de ambiente Java para ROOT.xml do Tomcat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avmesquita/java-environment-configurator.git"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @avm/core && npm run build -w @avm/cli && npm run build -w @avm/desktop",
+    "build:core": "npm run build -w @avm/core",
+    "build:cli": "npm run build -w @avm/cli",
+    "build:desktop": "npm run build -w @avm/desktop",
+    "start:desktop": "npm run start -w @avm/desktop",
+    "start:cli": "npm run start -w @avm/cli",
+    "test": "npm run test -w @avm/core",
+    "package:cli": "npm run package -w @avm/cli",
+    "package:desktop": "npm run electron:build -w @avm/desktop"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

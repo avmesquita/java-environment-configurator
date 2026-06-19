@@ -1,0 +1,48 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Projeto</h1>
+      <p>Altere o docBase e reutilize caminhos recentes entre branches</p>
+    </div>
+    <button type="button" (click)="load()">Atualizar</button>
+  </header>
+
+  @if (message) {
+    <div class="alert alert-success">{{ message }}</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-error">{{ error }}</div>
+  }
+
+  <article class="card">
+    <h2>docBase atual</h2>
+    <p class="current">{{ currentDocBase || 'Nao definido' }}</p>
+
+    <label>
+      Novo docBase
+      <input type="text" [(ngModel)]="draftDocBase" placeholder="C:\Projetos\...\target\app" />
+    </label>
+
+    <button type="button" (click)="saveDocBase()">Salvar docBase</button>
+  </article>
+
+  <article class="card">
+    <h2>Historico recente</h2>
+    @if (history.length === 0) {
+      <p class="muted">Nenhum docBase salvo ainda. Ao salvar, o caminho entra no historico.</p>
+    } @else {
+      <ul class="history-list">
+        @for (item of history; track item.id) {
+          <li>
+            <div class="history-info">
+              <strong>{{ item.docBase }}</strong>
+              <span class="meta">Usado {{ item.useCount }}x · {{ item.lastUsedAt }}</span>
+            </div>
+            <button type="button" (click)="activateHistory(item.docBase)">Ativar</button>
+          </li>
+        }
+      </ul>
+    }
+  </article>
+</section>

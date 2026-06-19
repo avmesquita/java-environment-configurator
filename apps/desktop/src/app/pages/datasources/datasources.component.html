@@ -1,0 +1,48 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>DataSources</h1>
+      <p>Edite cada Resource JDBC encontrado no ROOT.xml</p>
+    </div>
+    <button type="button" (click)="load()">Recarregar</button>
+  </header>
+
+  @if (message) {
+    <div class="alert alert-success">{{ message }}</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-error">{{ error }}</div>
+  }
+
+  @if (config) {
+    @if (config.hibernateDialect) {
+      <article class="card card-muted">
+        <h2>Dialect Hibernate (global)</h2>
+        <p class="mono">{{ config.hibernateDialect }}</p>
+      </article>
+    }
+
+    @for (item of config.dataSources; track item.name) {
+      @if (draft(item.name); as ds) {
+        <article class="card">
+          <header class="card-header">
+            <h2>{{ ds.name }}</h2>
+            <button type="button" (click)="save(ds.name)">Salvar</button>
+          </header>
+
+          <div class="form-grid">
+            <label>Usuario<input type="text" [(ngModel)]="ds.username" /></label>
+            <label>Senha<input type="password" [(ngModel)]="ds.password" /></label>
+            <label class="full">URL<input type="text" [(ngModel)]="ds.url" /></label>
+            <label class="full">Driver<input type="text" [(ngModel)]="ds.driverClassName" /></label>
+            <label>maxTotal<input type="text" [(ngModel)]="ds.maxTotal" /></label>
+            <label>maxIdle<input type="text" [(ngModel)]="ds.maxIdle" /></label>
+            <label>maxWaitMillis<input type="text" [(ngModel)]="ds.maxWaitMillis" /></label>
+            <label>validationQuery<input type="text" [(ngModel)]="ds.validationQuery" /></label>
+          </div>
+        </article>
+      }
+    }
+  }
+</section>

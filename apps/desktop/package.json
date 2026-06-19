@@ -1,0 +1,84 @@
+{
+  "name": "@avm/desktop",
+  "version": "1.0.0",
+  "description": "Java Environment Configurator Desktop",
+  "author": "avmesquita",
+  "main": "electron/dist/main.js",
+  "scripts": {
+    "ng": "ng",
+    "serve": "ng serve",
+    "start": "npm run electron",
+    "build": "ng build --configuration production --base-href ./",
+    "build:dev": "ng build --configuration development --base-href ./",
+    "watch": "ng build --watch --configuration development --base-href ./",
+    "test": "ng test",
+    "electron:compile": "tsc -p electron/tsconfig.json",
+    "electron": "npm run build:dev && npm run electron:compile && electron .",
+    "electron:build": "npm run build && npm run electron:compile && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.avm.environment.configurator",
+    "productName": "Java Environment Configurator",
+    "directories": {
+      "output": "../../release/desktop"
+    },
+    "files": [
+      "dist/desktop/browser/**/*",
+      "electron/dist/**/*",
+      "package.json",
+      "node_modules/better-sqlite3/**/*",
+      "node_modules/bindings/**/*",
+      "node_modules/file-uri-to-path/**/*"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "extraResources": [],
+    "electronVersion": "36.9.5",
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    },
+    "mac": {
+      "target": ["dmg"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@avm/core": "1.0.0",
+    "electron-log": "^5.4.3",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.29",
+    "@angular/cli": "^20.3.29",
+    "@angular/compiler-cli": "^20.3.0",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^22.15.30",
+    "electron": "36.9.5",
+    "electron-builder": "^26.0.12",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.9.2"
+  }
+}

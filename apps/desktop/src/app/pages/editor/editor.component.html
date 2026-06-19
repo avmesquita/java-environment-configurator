@@ -1,0 +1,41 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Editor Manual</h1>
+      <p>Altere docBase e conexao principal com backup automatico</p>
+    </div>
+    <button type="button" (click)="load()">Recarregar</button>
+  </header>
+
+  @if (message) {
+    <div class="alert alert-success">{{ message }}</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-error">{{ error }}</div>
+  }
+
+  <article class="card">
+    <h2>docBase</h2>
+    <label>
+      Pasta do projeto
+      <input type="text" [(ngModel)]="docBase" />
+    </label>
+    <button type="button" (click)="saveDocBase()">Salvar docBase</button>
+  </article>
+
+  @if (primary) {
+    <article class="card">
+      <h2>{{ primary.name }}</h2>
+      <div class="form-grid">
+        <label>Usuario<input type="text" [(ngModel)]="primary.username" /></label>
+        <label>Senha<input type="password" [(ngModel)]="primary.password" /></label>
+        <label class="full">URL<input type="text" [(ngModel)]="primary.url" /></label>
+        <label class="full">Driver<input type="text" [(ngModel)]="primary.driverClassName" /></label>
+        <label>maxTotal<input type="text" [(ngModel)]="primary.maxTotal" /></label>
+        <label>maxIdle<input type="text" [(ngModel)]="primary.maxIdle" /></label>
+      </div>
+      <button type="button" (click)="savePrimary()">Salvar DataSource</button>
+    </article>
+  }
+</section>

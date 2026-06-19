@@ -1,0 +1,83 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Perfis de Cliente</h1>
+      <p>Aplique credenciais em um DataSource especifico do ROOT.xml</p>
+    </div>
+    <div class="actions">
+      <button type="button" (click)="importProfiles()">Importar do ROOT.xml</button>
+      <button type="button" (click)="load()">Atualizar</button>
+    </div>
+  </header>
+
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Nome</th>
+          <th>Banco</th>
+          <th>Usuario</th>
+          <th>Dialect</th>
+          <th>URL</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (profile of profiles(); track profile.code) {
+          <tr>
+            <td><code>{{ profile.code }}</code></td>
+            <td>{{ profile.name }}</td>
+            <td>{{ profile.databaseName }}</td>
+            <td>{{ profile.username }}</td>
+            <td class="dialect">{{ profile.dialect }}</td>
+            <td class="url">{{ profile.url }}</td>
+            <td>
+              <button type="button" (click)="openApplyDialog(profile.code)" [disabled]="applying() === profile.code">
+                {{ applying() === profile.code ? 'Aplicando...' : 'Aplicar' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+@if (applyDialogOpen()) {
+  <div class="modal-backdrop" (click)="closeApplyDialog()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2>Aplicar perfil {{ selectedProfileCode() }}</h2>
+        <button type="button" class="btn-secondary" (click)="closeApplyDialog()">Fechar</button>
+      </header>
+
+      <label>
+        DataSource alvo
+        <select [(ngModel)]="selectedDataSourceName">
+          @for (item of config()?.dataSources ?? []; track item.name) {
+            <option [ngValue]="item.name">{{ item.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="updateDialect" />
+        Atualizar dialect Hibernate global com o dialect do perfil
+      </label>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeApplyDialog()">Cancelar</button>
+        <button type="button" (click)="confirmApply()">Aplicar perfil</button>
+      </footer>
+    </div>
+  </div>
+}

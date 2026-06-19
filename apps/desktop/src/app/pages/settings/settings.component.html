@@ -1,0 +1,42 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Configuracoes</h1>
+      <p>Como o aplicativo resolve o ROOT.xml do Tomcat</p>
+    </div>
+    <button type="button" (click)="load()">Atualizar</button>
+  </header>
+
+  @if (error) {
+    <div class="alert alert-error">{{ error }}</div>
+  }
+
+  @if (settingsView; as view) {
+    <article class="card">
+      <h2>ROOT.xml resolvido</h2>
+      <p class="resolved">{{ view.resolvedRootXmlPath || 'Nao encontrado' }}</p>
+    </article>
+
+    <article class="card">
+      <h2>Ordem de resolucao</h2>
+      <ol>
+        <li>Caminho manual (<code>customRootXmlPath</code>)</li>
+        <li><code>CATALINA_BASE</code> + conf/Catalina/localhost/ROOT.xml</li>
+        <li><code>CATALINA_HOME</code> + conf/Catalina/localhost/ROOT.xml</li>
+      </ol>
+      <p class="hint">Altere via variaveis de ambiente ou pelo CLI: <code>avm-config settings set</code></p>
+    </article>
+
+    <article class="card">
+      <h2>Valores atuais</h2>
+      <dl>
+        <dt>CATALINA_BASE</dt>
+        <dd>{{ view.settings.catalinaBase || '(nao definido)' }}</dd>
+        <dt>CATALINA_HOME</dt>
+        <dd>{{ view.settings.catalinaHome || '(nao definido)' }}</dd>
+        <dt>Caminho manual</dt>
+        <dd>{{ view.settings.customRootXmlPath || '(nao definido)' }}</dd>
+      </dl>
+    </article>
+  }
+</section>

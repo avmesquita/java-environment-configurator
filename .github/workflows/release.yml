@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-cli:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            pkg_target: node20-win-x64
+            artifact_name: avm-config-win-x64.exe
+          - os: ubuntu-latest
+            pkg_target: node20-linux-x64
+            artifact_name: avm-config-linux-x64
+          - os: macos-latest
+            pkg_target: node20-macos-x64
+            artifact_name: avm-config-macos-x64
+          - os: macos-latest
+            pkg_target: node20-macos-arm64
+            artifact_name: avm-config-macos-arm64
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build core and CLI
+        run: npm run build:core && npm run build:cli
+
+      - name: Package CLI with pkg
+        run: npx pkg apps/cli/package.json --targets ${{ matrix.pkg_target }} --output release/cli/${{ matrix.artifact_name }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.artifact_name }}
+          path: release/cli/${{ matrix.artifact_name }}
+
+  build-desktop:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+          - os: ubuntu-latest
+          - os: macos-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop
+        run: npm run build -w @avm/desktop && npm run electron:compile -w @avm/desktop
+
+      - name: Package desktop with electron-builder
+        run: npm run electron:build -w @avm/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: release/desktop/*
+
+  publish:
+    needs: [build-cli, build-desktop]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
