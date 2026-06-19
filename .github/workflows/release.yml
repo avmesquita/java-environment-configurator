@@ -83,6 +83,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build core
+        run: npm run build:core
+
       - name: Build and package desktop
         working-directory: apps/desktop
         run: npm run build && npm run electron:compile && npx electron-builder --publish never
