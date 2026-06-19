@@ -11,19 +11,20 @@ permissions:
 jobs:
   build-cli:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
-            pkg_target: node20-win-x64
+            pkg_target: node18-win-x64
             artifact_name: avm-config-win-x64.exe
           - os: ubuntu-latest
-            pkg_target: node20-linux-x64
+            pkg_target: node18-linux-x64
             artifact_name: avm-config-linux-x64
           - os: macos-latest
-            pkg_target: node20-macos-x64
+            pkg_target: node18-macos-x64
             artifact_name: avm-config-macos-x64
           - os: macos-latest
-            pkg_target: node20-macos-arm64
+            pkg_target: node18-macos-arm64
             artifact_name: avm-config-macos-arm64
     runs-on: ${{ matrix.os }}
 
@@ -32,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -41,8 +42,14 @@ jobs:
       - name: Build core and CLI
         run: npm run build:core && npm run build:cli
 
+      - name: Rebuild native dependencies for runner
+        run: npm rebuild better-sqlite3 -w @avm/core
+
       - name: Package CLI with pkg
-        run: npx pkg apps/cli/package.json --targets ${{ matrix.pkg_target }} --output release/cli/${{ matrix.artifact_name }}
+        shell: bash
+        run: |
+          mkdir -p release/cli
+          npx pkg apps/cli/package.json --targets ${{ matrix.pkg_target }} --output release/cli/${{ matrix.artifact_name }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -51,6 +58,7 @@ jobs:
 
   build-desktop:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
@@ -63,19 +71,23 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 build-essential python3
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build desktop
-        run: npm run build -w @avm/desktop && npm run electron:compile -w @avm/desktop
-
-      - name: Package desktop with electron-builder
-        run: npm run electron:build -w @avm/desktop
+      - name: Build and package desktop
+        working-directory: apps/desktop
+        run: npm run build && npm run electron:compile && npx electron-builder --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - uses: actions/upload-artifact@v4
         with:
