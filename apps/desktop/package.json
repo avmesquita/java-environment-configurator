@@ -2,6 +2,7 @@
   "name": "@avm/desktop",
   "version": "1.0.0",
   "description": "Java Environment Configurator Desktop",
+  "desktopName": "java-environment-configurator",
   "author": "avmesquita",
   "main": "electron/dist/main.js",
   "scripts": {
@@ -21,6 +22,8 @@
   "build": {
     "appId": "com.avm.environment.configurator",
     "productName": "Java Environment Configurator",
+    "executableName": "java-environment-configurator",
+    "artifactName": "java-environment-configurator-${version}.${ext}",
     "directories": {
       "output": "../../release/desktop"
     },
@@ -38,10 +41,14 @@
     "extraResources": [],
     "electronVersion": "36.9.5",
     "win": {
-      "target": ["nsis", "portable"]
+      "target": ["nsis", "portable"],
+      "executableName": "java-environment-configurator"
     },
     "linux": {
-      "target": ["AppImage"]
+      "target": ["AppImage"],
+      "executableName": "java-environment-configurator",
+      "syncDesktopName": true,
+      "category": "Development"
     },
     "mac": {
       "target": ["dmg"]
@@ -49,7 +56,11 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "artifactName": "java-environment-configurator-setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "java-environment-configurator-portable-${version}.${ext}"
     }
   },
   "private": true,
