@@ -55,6 +55,7 @@ jobs:
         with:
           name: cli-${{ matrix.artifact_name }}
           path: release/cli/${{ matrix.artifact_name }}
+          if-no-files-found: error
 
   build-desktop:
     strategy:
@@ -62,8 +63,13 @@ jobs:
       matrix:
         include:
           - os: windows-latest
+            upload_paths: |
+              release/desktop/java-environment-configurator-setup-*.exe
+              release/desktop/java-environment-configurator-portable-*.exe
           - os: ubuntu-latest
+            upload_paths: release/desktop/java-environment-configurator-*.AppImage
           - os: macos-latest
+            upload_paths: release/desktop/java-environment-configurator-*.dmg
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -95,7 +101,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ matrix.os }}
-          path: release/desktop/*
+          path: ${{ matrix.upload_paths }}
+          if-no-files-found: error
 
   publish:
     needs: [build-cli, build-desktop]
@@ -108,10 +115,69 @@ jobs:
         with:
           path: artifacts
 
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-upload
+
+          copy_by_name() {
+            local name="$1"
+            local file
+            file="$(find artifacts -type f -name "$name" | head -n 1 || true)"
+            if [ -z "$file" ]; then
+              echo "Missing release asset: $name"
+              exit 1
+            fi
+            cp -f "$file" "release-upload/$name"
+          }
+
+          copy_by_glob() {
+            local pattern="$1"
+            shopt -s nullglob
+            local matches=(artifacts/**/$pattern)
+            shopt -u nullglob
+            if [ "${#matches[@]}" -eq 0 ]; then
+              echo "Missing release asset pattern: $pattern"
+              exit 1
+            fi
+            for file in "${matches[@]}"; do
+              cp -f "$file" "release-upload/$(basename "$file")"
+            done
+          }
+
+          copy_by_name avm-config-win-x64.exe
+          copy_by_name avm-config-linux-x64
+          copy_by_name avm-config-macos-x64
+          copy_by_name avm-config-macos-arm64
+
+          copy_by_glob "java-environment-configurator-setup-*.exe"
+          copy_by_glob "java-environment-configurator-portable-*.exe"
+          copy_by_glob "java-environment-configurator-*.AppImage"
+          copy_by_glob "java-environment-configurator-*.dmg"
+
+          echo "Release assets:"
+          ls -la release-upload
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: artifacts/**/*
+          body: |
+            ## Downloads
+
+            ### CLI (`avm-config`)
+            - `avm-config-win-x64.exe` ? Windows
+            - `avm-config-linux-x64` ? Linux
+            - `avm-config-macos-x64` ? macOS Intel
+            - `avm-config-macos-arm64` ? macOS Apple Silicon
+
+            ### Desktop (`java-environment-configurator`)
+            - `java-environment-configurator-setup-<versao>.exe` ? Windows (instalador)
+            - `java-environment-configurator-portable-<versao>.exe` ? Windows (portable)
+            - `java-environment-configurator-<versao>.AppImage` ? Linux
+            - `java-environment-configurator-<versao>.dmg` ? macOS
+          files: release-upload/*
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
